@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Palaver</string>
+    <string name="palaver_text_view">PALAVER</string>
+    <string name="benutzername_edit_text">Benutzername</string>
+    <string name="passwort_login_edit_text">Passwort</string>
+    <string name="login_button">LogIn</string>
+    <string name="register_button">Registrieren</string>
+    <string name="password_again_edit_text">Passwort (nochmal)</string>
+    <string name="registrieren_text_view">Noch keinen Account? Jetzt registrieren.</string>
+</resources>
