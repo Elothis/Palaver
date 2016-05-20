@@ -41,6 +41,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/send_registration_button"
-        android:text="@string/register_button"/>
+        android:text="@string/register_button"
+        android:onClick="registerNewAccount"/>
 
 </LinearLayout>

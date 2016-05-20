@@ -7,4 +7,8 @@
     <string name="register_button">Registrieren</string>
     <string name="password_again_edit_text">Passwort (nochmal)</string>
     <string name="registrieren_text_view">Noch keinen Account? Jetzt registrieren.</string>
+    <string name="action_bar_logout">Logout</string>
+    <string name="add_contact_button">+</string>
+    <string name="add_contact_dialog_text_view">Gib den Namen eines Palaver-Nutzers ein, um diesen hinzuzufügen.</string>
+    <string name="add_contact_hint">Kontaktname</string>
 </resources>
