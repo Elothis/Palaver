@@ -1,13 +1,12 @@
 package fabian.de.palaver;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -26,11 +25,21 @@ public class ContactListActivity extends AppCompatActivity {
         ListView contactList = (ListView) findViewById(R.id.contact_list_view);
 
         contactList.setAdapter(adapter);
+
+        contactList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String contactSelected = String.valueOf(parent.getItemAtPosition(position));
+                Intent startChatIntent = new Intent(ContactListActivity.this, ChatActivity.class);
+                startChatIntent.putExtra("Chat Partner", contactSelected);
+                startActivity(startChatIntent);
+            }
+        });
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
+        getMenuInflater().inflate(R.menu.contact_list_menu, menu);
         return true;
     }
 
@@ -44,34 +53,13 @@ public class ContactListActivity extends AppCompatActivity {
             startActivity(logOut);
         }
 
+        else if(id == R.id.action_bar_add_contact){
+            AddContactDialog dialog = new AddContactDialog();
+
+            dialog.show(getFragmentManager(), "Add Contact");
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
-    public void addContact(View view) {
-/*
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-
-        builder.setMessage("Kontakt hinzufügen");
-
-        builder.setPositiveButton("Hinzufügen", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-            }
-        });
-        builder.setNegativeButton("Abbrechen", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                getFragmentManager().popBackStack();
-            }
-        });
-
-        builder.setView(getLayoutInflater().inflate(R.layout.add_contact_dialog, null, false));
-
-        builder.show();*/
-
-        AddContactDialog dialog = new AddContactDialog();
-
-        dialog.show(getFragmentManager(), "Add Contact");
-    }
 }
