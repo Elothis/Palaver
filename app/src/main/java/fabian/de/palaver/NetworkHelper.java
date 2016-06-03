@@ -25,52 +25,53 @@ public class NetworkHelper extends AsyncTask<String, Integer, ApiResult> {
 
     public URL getApiUrl(ApiCommand command){
 
-        URL result = null;
-
-        try {
+        String urlString = "http://palaver.se.paluno.uni-due.de/api";
 
             switch (command) {
                 case USER_VALIDATE:
-                    result = new URL("http://palaver.se.paluno.uni-due.de/api/user/register");
+                    urlString += "/user/register";
                     break;
                 case USER_REGISTER:
-                    result = new URL("http://palaver.se.paluno.uni-due.de/api/user/validate");
+                    urlString += "/user/validate";
                     break;
                 case USER_PASSWORD:
-                    result = new URL("http://palaver.se.paluno.uni-due.de/api/user/password");
+                    urlString += "/user/password";
                     break;
                 case USER_PUSHTOKEN:
-                    result = new URL("http://palaver.se.paluno.uni-due.de/api/user/pushtoken");
+                    urlString += "/user/pushtoken";
                     break;
                 case MESSAGE_SEND:
-                    result = new URL("http://palaver.se.paluno.uni-due.de/api/message/send");
+                    urlString += "/message/send";
                     break;
                 case MESSAGE_GET:
-                    result = new URL("http://palaver.se.paluno.uni-due.de/api/message/get");
+                    urlString += "/message/get";
                     break;
                 case MESSAGE_GETOFFSET:
-                    result = new URL("http://palaver.se.paluno.uni-due.de/api/message/getoffset");
+                    urlString += "/message/getoffset";
                     break;
                 case FRIENDS_ADD:
-                    result = new URL("http://palaver.se.paluno.uni-due.de/api/friends/add");
+                    urlString += "/friends/add";
                     break;
                 case FRIENDS_GET:
-                    result = new URL("http://palaver.se.paluno.uni-due.de/api/friends/get");
+                    urlString += "/friends/get";
                     break;
                 case FRIENDS_REMOVE:
-                    result = new URL("http://palaver.se.paluno.uni-due.de/api/friends/remove");
+                    urlString += "/friends/remove";
                     break;
                 default:
-                    result = null;
                     break;
             }
-            return result;
-        }
-        catch (MalformedURLException e){
+        URL url = null;
+        try {
+            url = new URL(urlString);
+        } catch (MalformedURLException e) {
             e.printStackTrace();
         }
-        return result;
-    }
+
+        return url;
+        }
+
+
 
     @Override
     protected ApiResult doInBackground(String... strings) {
