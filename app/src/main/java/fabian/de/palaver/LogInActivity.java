@@ -7,10 +7,14 @@ import android.view.View;
 
 public class LogInActivity extends AppCompatActivity {
 
+    private PalaverApplication app;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_log_in);
+        app = (PalaverApplication) getApplication();
+        app.setContext(this);
     }
 
     public void openRegisterActivity(View view) {

@@ -13,12 +13,17 @@ import android.widget.ListView;
 
 public class ContactListActivity extends AppCompatActivity {
 
+    private PalaverApplication app;
+
     private String[] contacts = {"Herbert", "Günther", "Gwendolyn", "Helmut", "Frank", "Annette", "Susanne"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_contact_list);
+
+        app = (PalaverApplication) getApplication();
+        app.setContext(this);
 
         ListAdapter adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, contacts);
 

@@ -12,28 +12,30 @@
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/editText"
+        android:id="@+id/chat_message_edit_text"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_toLeftOf="@+id/imageButton"
-        android:layout_toStartOf="@+id/imageButton"
-        android:hint="@string/chat_edit_text_hint"/>
+        android:layout_toLeftOf="@+id/send_message_image_button"
+        android:layout_toStartOf="@+id/send_message_image_button"
+        android:hint="@string/chat_edit_text_hint" />
 
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/imageButton"
-        android:layout_below="@+id/listView"
-        android:layout_alignRight="@+id/listView"
-        android:layout_alignEnd="@+id/listView"
-        android:src="@drawable/send_button" />
+        android:id="@+id/send_message_image_button"
+        android:layout_below="@+id/chat_list_view"
+        android:layout_alignRight="@+id/chat_list_view"
+        android:layout_alignEnd="@+id/chat_list_view"
+        android:src="@drawable/send_button"/>
 
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/listView"
+        android:id="@+id/chat_list_view"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_above="@+id/editText" />
+        android:layout_above="@+id/chat_message_edit_text"
+        android:transcriptMode="alwaysScroll"
+        android:stackFromBottom="true"/>
 </RelativeLayout>

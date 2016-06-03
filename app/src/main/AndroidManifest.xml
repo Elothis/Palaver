@@ -5,14 +5,16 @@
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
+        android:name=".PalaverApplication"
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/palaver_logo_rund"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
             android:name=".LogInActivity"
-            android:label="@string/app_name">
+            android:label="@string/app_name"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -21,11 +23,12 @@
         </activity>
         <activity
             android:name=".RegisterActivity"
-            android:label="@string/app_name" />
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".ContactListActivity"
             android:label="@string/app_name" />
-        <activity android:name=".ChatActivity"></activity>
+        <activity android:name=".ChatActivity"/>
     </application>
 
 </manifest>
