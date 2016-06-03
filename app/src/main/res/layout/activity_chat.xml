@@ -37,5 +37,6 @@
         android:layout_centerHorizontal="true"
         android:layout_above="@+id/chat_message_edit_text"
         android:transcriptMode="alwaysScroll"
-        android:stackFromBottom="true"/>
+        android:stackFromBottom="true"
+        android:divider="@null"/>
 </RelativeLayout>
