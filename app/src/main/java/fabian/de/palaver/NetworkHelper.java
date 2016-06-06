@@ -3,8 +3,16 @@ package fabian.de.palaver;
 import android.os.AsyncTask;
 import android.widget.Button;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 
 public class NetworkHelper extends AsyncTask<String, Integer, ApiResult> {
 
@@ -15,10 +23,12 @@ public class NetworkHelper extends AsyncTask<String, Integer, ApiResult> {
 
     }
 
+    private OnDownloadFinished activityToNotify;
     private Button toDisable;
     private ApiCommand command;
 
-    public NetworkHelper(Button toDisable, ApiCommand command) {
+    public NetworkHelper(OnDownloadFinished activityToNotify, Button toDisable, ApiCommand command) {
+        this.activityToNotify = activityToNotify;
         this.toDisable = toDisable;
         this.command = command;
     }
@@ -75,6 +85,32 @@ public class NetworkHelper extends AsyncTask<String, Integer, ApiResult> {
 
     @Override
     protected ApiResult doInBackground(String... strings) {
+        ApiCommand apiCommand = ApiCommand.valueOf(strings[0]);
+        URL url = getApiUrl(apiCommand);
+        try {
+            URLConnection connection = url.openConnection();
+            connection.setDoOutput(true);
+            connection.setRequestProperty("Contect-Type", "application/json");
+            OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
+            wr.write(strings[1]);
+            wr.flush();
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String text = "";
+            StringBuilder sb = new StringBuilder();
+            String line = null;
+            while ((line = reader.readLine()) != null){
+                sb.append(line);
+                sb.append("\n");
+            }
+            text = sb.toString();
+            reader.close();
+            return new ApiResult(apiCommand, new JSONObject(text));
+
+        } catch (IOException | JSONException e) {
+            e.printStackTrace();
+        }
+
         return null;
     }
 
@@ -92,4 +128,7 @@ public class NetworkHelper extends AsyncTask<String, Integer, ApiResult> {
         }
     }
 
+    public OnDownloadFinished getActivityToNotify() {
+        return activityToNotify;
+    }
 }

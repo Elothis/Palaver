@@ -5,7 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
-public class RegisterActivity extends AppCompatActivity {
+public class RegisterActivity extends AppCompatActivity implements OnDownloadFinished{
 
     private PalaverApplication app;
 
@@ -21,5 +21,10 @@ public class RegisterActivity extends AppCompatActivity {
     public void registerNewAccount(View view) {
         Intent openContactListIntent = new Intent(this, ContactListActivity.class);
         startActivity(openContactListIntent);
+    }
+
+    @Override
+    public void onDownloadFinished(ApiResult json) {
+
     }
 }

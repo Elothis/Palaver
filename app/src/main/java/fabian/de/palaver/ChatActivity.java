@@ -89,12 +89,12 @@ public class ChatActivity extends AppCompatActivity {
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendTextMessage(v);
+                sendTextMessage();
             }
         });
     }
 
-    private void sendTextMessage(View v){
+    private void sendTextMessage(){
         String message = messageEditText.getEditableText().toString();
         if(!message.isEmpty()){
             ChatMessage chatMessage = new ChatMessage(app.getUserName(), chatPartner, Calendar.getInstance().getTime(), message);
