@@ -13,4 +13,8 @@
     <string name="add_contact_hint">Kontaktname</string>
     <string name="chat_edit_text_hint">Nachricht</string>
     <string name="action_bar_add_contact">+</string>
+    <string name="empty_username">Bitte gib einen Nutzernamen ein!</string>
+    <string name="wrong_password">Bitte überprüfe dein Passwort!</string>
+    <string name="register_username_already_existend">Benutzer existiert bereits</string>
+    <string name="invalid_login">Ungültiger Login</string>
 </resources>

@@ -1,6 +1,7 @@
 package fabian.de.palaver;
 
 import android.os.AsyncTask;
+import android.util.Log;
 import android.widget.Button;
 
 import org.json.JSONException;
@@ -24,13 +25,9 @@ public class NetworkHelper extends AsyncTask<String, Integer, ApiResult> {
     }
 
     private OnDownloadFinished activityToNotify;
-    private Button toDisable;
-    private ApiCommand command;
 
-    public NetworkHelper(OnDownloadFinished activityToNotify, Button toDisable, ApiCommand command) {
+    public NetworkHelper(OnDownloadFinished activityToNotify) {
         this.activityToNotify = activityToNotify;
-        this.toDisable = toDisable;
-        this.command = command;
     }
 
     public URL getApiUrl(ApiCommand command){
@@ -39,10 +36,10 @@ public class NetworkHelper extends AsyncTask<String, Integer, ApiResult> {
 
             switch (command) {
                 case USER_VALIDATE:
-                    urlString += "/user/register";
+                    urlString += "/user/validate";
                     break;
                 case USER_REGISTER:
-                    urlString += "/user/validate";
+                    urlString += "/user/register";
                     break;
                 case USER_PASSWORD:
                     urlString += "/user/password";
@@ -81,8 +78,6 @@ public class NetworkHelper extends AsyncTask<String, Integer, ApiResult> {
         return url;
         }
 
-
-
     @Override
     protected ApiResult doInBackground(String... strings) {
         ApiCommand apiCommand = ApiCommand.valueOf(strings[0]);
@@ -90,7 +85,7 @@ public class NetworkHelper extends AsyncTask<String, Integer, ApiResult> {
         try {
             URLConnection connection = url.openConnection();
             connection.setDoOutput(true);
-            connection.setRequestProperty("Contect-Type", "application/json");
+            connection.setRequestProperty("Content-Type", "application/json");
             OutputStreamWriter wr = new OutputStreamWriter(connection.getOutputStream());
             wr.write(strings[1]);
             wr.flush();
@@ -110,22 +105,19 @@ public class NetworkHelper extends AsyncTask<String, Integer, ApiResult> {
         } catch (IOException | JSONException e) {
             e.printStackTrace();
         }
-
+        Log.v("apiresult", "Should NOT reach this");
         return null;
     }
 
     @Override
     protected void onPreExecute() {
-        if (toDisable != null){
-            toDisable.setEnabled(false);
-        }
+
     }
 
     @Override
     protected void onPostExecute(ApiResult apiResult) {
-        if (toDisable != null){
-            toDisable.setEnabled(true);
-        }
+        if(apiResult == null) Log.v("apiresult", "apiResult is NULL :(");
+        activityToNotify.onDownloadFinished(apiResult);
     }
 
     public OnDownloadFinished getActivityToNotify() {
