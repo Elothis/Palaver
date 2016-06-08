@@ -2,7 +2,6 @@ package fabian.de.palaver;
 
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.Button;
 
 import org.json.JSONException;
 import org.json.JSONObject;
