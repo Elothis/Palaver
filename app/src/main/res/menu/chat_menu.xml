@@ -6,4 +6,8 @@
         android:title="@string/action_bar_logout"
         app:showAsAction="never" />
 
+    <item android:id="@+id/action_bar_refresh"
+        android:title="@string/refresh_action_bar"
+        app:showAsAction="ifRoom|withText"/>
+
 </menu>

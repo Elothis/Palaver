@@ -21,8 +21,15 @@ public class LogInActivity extends AppCompatActivity implements OnDownloadFinish
         setContentView(R.layout.activity_log_in);
         username = (EditText) findViewById(R.id.user_name_login_edit_text);
         password = (EditText) findViewById(R.id.passwort_login_edit_text);
+        username.setText("");
+        password.setText("");
         app = (PalaverApplication) getApplication();
         app.setContext(this);
+        String user = app.getUserName();
+
+        if(!user.isEmpty()){
+            sendLogInRequest(app.getUserName(), app.getPassword());
+        }
     }
 
     public void openRegisterActivity(View view) {
@@ -41,15 +48,7 @@ public class LogInActivity extends AppCompatActivity implements OnDownloadFinish
             return;
         }
 
-        NetworkHelper nwh = new NetworkHelper(this);
-        JSONObject json = new JSONObject();
-        try {
-            json.put("Username", username.getText().toString());
-            json.put("Password", password.getText().toString());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        nwh.execute("USER_VALIDATE", json.toString());
+        sendLogInRequest(username.getText().toString(), password.getText().toString());
     }
 
     @Override
@@ -61,7 +60,7 @@ public class LogInActivity extends AppCompatActivity implements OnDownloadFinish
         JSONObject serverAnswer = json.getJsonobj();
         try {
             if(serverAnswer.getInt("MsgType") == 0){
-                Toast.makeText(this, R.string.invalid_login, Toast.LENGTH_LONG).show();
+                Toast.makeText(this, serverAnswer.getString("Info"), Toast.LENGTH_LONG).show();
             }
             else{
                 app.setUsername(username.getText().toString());
@@ -73,5 +72,17 @@ public class LogInActivity extends AppCompatActivity implements OnDownloadFinish
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    private void sendLogInRequest(String username, String password){
+        NetworkHelper nwh = new NetworkHelper(this);
+        JSONObject json = new JSONObject();
+        try {
+            json.put("Username", username);
+            json.put("Password", password);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        nwh.execute(NetworkHelper.ApiCommand.USER_VALIDATE.toString(), json.toString());
     }
 }

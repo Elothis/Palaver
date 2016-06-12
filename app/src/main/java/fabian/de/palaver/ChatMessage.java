@@ -11,14 +11,16 @@ public class ChatMessage {
     private String date;
     private long timestamp;
     private String messageText;
+    private String mimetype;
 
-    public ChatMessage(String from, String to, Date date, String messageText){
+    public ChatMessage(String from, String to, Date date, String mimetype, String messageText){
         this.from = from;
         this.to = to;
         this.timestamp = date.getTime();
         DateFormat dfOutput = new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.ENGLISH);
         this.date = dfOutput.format(date);
         this.messageText = messageText;
+        this.mimetype = mimetype;
     }
 
     public String from() {
@@ -40,4 +42,6 @@ public class ChatMessage {
     public String getMessageText() {
         return messageText;
     }
+
+    public String getMimetype(){ return mimetype; }
 }

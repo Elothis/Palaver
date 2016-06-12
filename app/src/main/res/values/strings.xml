@@ -17,4 +17,7 @@
     <string name="wrong_password">Bitte überprüfe dein Passwort!</string>
     <string name="register_username_already_existend">Benutzer existiert bereits</string>
     <string name="invalid_login">Ungültiger Login</string>
+    <string name="refresh_action_bar">Refresh</string>
+    <string name="refresh_contacts_action_menu">refresh</string>
+    <string name="remove_friend_dialog">Freund entfernen?</string>
 </resources>

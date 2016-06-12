@@ -11,19 +11,27 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
-public class ChatActivity extends AppCompatActivity {
+public class ChatActivity extends AppCompatActivity implements OnDownloadFinished{
 
     PalaverApplication app;
     private EditText messageEditText;
     private String chatPartner;
     private ListView chatListView;
     private ImageButton sendButton;
-    private List<ChatMessage> chatList;
+    private List<ChatMessage> chatList = new ArrayList<>();
     private ChatAdapter adapter;
 
     @Override
@@ -34,10 +42,13 @@ public class ChatActivity extends AppCompatActivity {
         initialiizeWidgets();
         chatPartner = getIntent().getExtras().getString("Chat Partner");
         setTitle(chatPartner);
+        app = (PalaverApplication) getApplication();
+        app.setContext(this);
 
-        chatList = new ArrayList<>();
         adapter = new ChatAdapter(this, chatList, app);
         chatListView.setAdapter(adapter);
+
+        getChatHistory();
 
     }
 
@@ -53,8 +64,15 @@ public class ChatActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if(id == R.id.action_bar_logout){
+            app.setUsername("");
+            app.setPassword("");
+
             Intent logOut = new Intent(this, LogInActivity.class);
             startActivity(logOut);
+        }
+
+        else if(id == R.id.action_bar_refresh){
+            getChatHistory();
         }
 
         return super.onOptionsItemSelected(item);
@@ -95,17 +113,79 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void sendTextMessage(){
-        String message = messageEditText.getEditableText().toString();
+        String message = messageEditText.getText().toString();
         if(!message.isEmpty()){
-            ChatMessage chatMessage = new ChatMessage(app.getUserName(), chatPartner, Calendar.getInstance().getTime(), message);
-            chatList.add(chatMessage);
-            adapter.notifyDataSetChanged();
-            messageEditText.setText("");
+            NetworkHelper nwh = new NetworkHelper(this);
+            JSONObject json = new JSONObject();
+            try {
+                json.put("Username", app.getUserName());
+                json.put("Password", app.getPassword());
+                json.put("Recipient", chatPartner);
+                json.put("Mimetype", "text/plain");
+                json.put("Data", message);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            nwh.execute(NetworkHelper.ApiCommand.MESSAGE_SEND.toString(), json.toString());
+        }
+    }
 
-            //dummy echo-message from chat partner
-            ChatMessage chatMessageEcho = new ChatMessage(chatPartner, app.getUserName(), Calendar.getInstance().getTime(), message);
-            chatList.add(chatMessageEcho);
-            adapter.notifyDataSetChanged();
+    private void getChatHistory(){
+        NetworkHelper nwh = new NetworkHelper(this);
+        JSONObject json = new JSONObject();
+        try {
+            json.put("Username", app.getUserName());
+            json.put("Password", app.getPassword());
+            json.put("Recipient", chatPartner);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        nwh.execute(NetworkHelper.ApiCommand.MESSAGE_GET.toString(), json.toString());
+    }
+
+    @Override
+    public void onDownloadFinished(ApiResult json) {
+        NetworkHelper.ApiCommand command = json.getApicmd();
+        JSONObject serverAnswer = json.getJsonobj();
+
+        try {
+            switch (command) {
+                case MESSAGE_GET:
+                    if (serverAnswer.getInt("MsgType") == 1) {
+                        chatList.clear();
+                        JSONArray jarray = serverAnswer.getJSONArray("Data");
+                        JSONObject jitem;
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+
+                        for(int i = 0; i < jarray.length(); i++){
+                            jitem = jarray.getJSONObject(i);
+                            String sender = jitem.getString("Sender");
+                            String recipient = jitem.getString("Recipient");
+                            String mimetype = jitem.getString("Mimetype");
+                            String data = jitem.getString("Data");
+                            Date date = dateFormat.parse(jitem.getString("DateTime"));
+
+                            chatList.add(new ChatMessage(sender, recipient, date, mimetype, data));
+                        }
+                        adapter.notifyDataSetChanged();
+                    }
+                    else{
+                        Toast.makeText(this, serverAnswer.getString("Info"), Toast.LENGTH_SHORT).show();
+                    }
+                    break;
+                case MESSAGE_SEND:
+                    if(serverAnswer.getInt("MsgType") == 1){
+                        getChatHistory();
+                        messageEditText.setText("");
+                    }
+                    else{
+                        Toast.makeText(this, serverAnswer.getString("Info"), Toast.LENGTH_SHORT).show();
+                    }
+                    break;
+            }
+        }
+        catch(JSONException | ParseException e){
+            e.printStackTrace();
         }
     }
 }

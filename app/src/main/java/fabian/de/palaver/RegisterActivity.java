@@ -30,10 +30,10 @@ public class RegisterActivity extends AppCompatActivity implements OnDownloadFin
 
     public void registerNewAccount(View view) {
 
-        if(username.getText().length() == 0){
+        if(username.getText().toString().length() == 0){
             Toast.makeText(this, R.string.empty_username, Toast.LENGTH_SHORT).show();
             return;
-        } else if (!password1.getText().equals(password2.getText()) || password1.getText().length() == 0) {
+        } else if (!password1.getText().toString().equals(password2.getText().toString()) || password1.getText().toString().length() == 0) {
             Toast.makeText(this, R.string.wrong_password, Toast.LENGTH_SHORT).show();
             return;
         }
@@ -48,7 +48,7 @@ public class RegisterActivity extends AppCompatActivity implements OnDownloadFin
             e.printStackTrace();
         }
 
-        nwh.execute("USER_REGISTER", json.toString());
+        nwh.execute(NetworkHelper.ApiCommand.USER_REGISTER.toString(), json.toString());
     }
 
     @Override
@@ -57,7 +57,7 @@ public class RegisterActivity extends AppCompatActivity implements OnDownloadFin
 
         try {
             if(serverAnswer.getInt("MsgType") == 0){
-                Toast.makeText(this, R.string.register_username_already_existend, Toast.LENGTH_LONG).show();
+                Toast.makeText(this, serverAnswer.getString("Info"), Toast.LENGTH_LONG).show();
             }
             else{
                 app.setUsername(username.getText().toString());
