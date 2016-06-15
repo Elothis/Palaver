@@ -10,7 +10,11 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class LogInActivity extends AppCompatActivity implements OnDownloadFinished{
+import fabian.de.palaver.networking.ApiResult;
+import fabian.de.palaver.networking.NetworkHelper;
+import fabian.de.palaver.networking.OnDownloadFinished;
+
+public class LogInActivity extends AppCompatActivity implements OnDownloadFinished {
 
     private PalaverApplication app;
     private EditText username, password;

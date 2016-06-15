@@ -46,7 +46,6 @@ public class ChatAdapter extends ArrayAdapter<ChatMessage>{
         LinearLayout outerLayout = (LinearLayout) rowView.findViewById(R.id.bubble_parent_layout);
 
 
-
         if(message.from().equalsIgnoreCase(app.getUserName())){
             innerLayout.setBackgroundResource(R.drawable.bubble_right);
             outerLayout.setGravity(Gravity.END);

@@ -1,4 +1,4 @@
-package fabian.de.palaver;
+package fabian.de.palaver.networking;
 
 import org.json.JSONObject;
 

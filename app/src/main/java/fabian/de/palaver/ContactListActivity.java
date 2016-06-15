@@ -21,6 +21,10 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import fabian.de.palaver.networking.ApiResult;
+import fabian.de.palaver.networking.NetworkHelper;
+import fabian.de.palaver.networking.OnDownloadFinished;
+
 import static java.util.Collections.sort;
 
 public class ContactListActivity extends AppCompatActivity implements OnDownloadFinished, AddContactInterface{

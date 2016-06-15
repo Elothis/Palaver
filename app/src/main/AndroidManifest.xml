@@ -3,6 +3,10 @@
     package="fabian.de.palaver">
 
     <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="fabian.de.palaver.permission.C2D_MESSAGE"/>
+    <uses-permission android:name="com.google.android.c2dm.permision.SEND"/>
+
+
 
     <application
         android:name=".PalaverApplication"
@@ -12,6 +16,39 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:debuggable="true">
+
+        <receiver
+            android:name="com.google.android.gms.gcm.GcmReceiver"
+            android:exported="true"
+            android:permission="com.google.android.c2dm.permission.SEND">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+                <action android:name="com.google.android.c2dm.intent.REGISTRATION" />
+                <category android:name="fabian.de.palaver" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name=".gcm.PalaverGcmListenerService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".gcm.PalaverInstanceIDListenerService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.android.gms.iid.InstanceID" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".gcm.TokenService"
+            android:exported="false">
+        </service>
+
         <activity
             android:name=".LogInActivity"
             android:label="@string/app_name"

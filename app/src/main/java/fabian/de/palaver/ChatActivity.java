@@ -20,11 +20,14 @@ import org.json.JSONObject;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-public class ChatActivity extends AppCompatActivity implements OnDownloadFinished{
+import fabian.de.palaver.networking.ApiResult;
+import fabian.de.palaver.networking.NetworkHelper;
+import fabian.de.palaver.networking.OnDownloadFinished;
+
+public class ChatActivity extends AppCompatActivity implements OnDownloadFinished {
 
     PalaverApplication app;
     private EditText messageEditText;
