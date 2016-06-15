@@ -135,6 +135,7 @@ public class ContactListActivity extends AppCompatActivity implements OnDownload
             JSONObject json = new JSONObject();
             try {
                 json.put("Username", app.getUserName());
+                Log.v("mytag", "userName in setFriendsList() = " + app.getUserName());
                 json.put("Password", app.getPassword());
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -162,13 +163,13 @@ public class ContactListActivity extends AppCompatActivity implements OnDownload
                     }
                     else{
                         Toast.makeText(this, "FGET " + serverAnswer.getString("Info"), Toast.LENGTH_SHORT).show();
-                        Log.v("mytag", "FRIENDS_GET failed");
+                        Log.v("mytag", "FRIENDS_GET failed" + " - " + serverAnswer.getString("Info"));
                     }
                     break;
                 case FRIENDS_ADD:
                     if(serverAnswer.getInt("MsgType") == 0){
                         Toast.makeText(this, "FADD " + serverAnswer.getString("Info"), Toast.LENGTH_SHORT).show();
-                        Log.v("mytag", "FRIENDS_ADD failed");
+                        Log.v("mytag", "FRIENDS_ADD failed" + " - " + serverAnswer.getString("Info"));
                     }
                     else{
                         Toast.makeText(this, serverAnswer.getString("Info"), Toast.LENGTH_SHORT).show();
@@ -179,7 +180,7 @@ public class ContactListActivity extends AppCompatActivity implements OnDownload
                 case FRIENDS_REMOVE:
                     if(serverAnswer.getInt("MsgType") == 0){
                         Toast.makeText(this, "FREM " + serverAnswer.getString("Info"), Toast.LENGTH_SHORT).show();
-                        Log.v("mytag", "FRIENDS_REMOVE failed");
+                        Log.v("mytag", "FRIENDS_REMOVE failed" + " - " + serverAnswer.getString("Info"));
                     }
                     else{
                         Toast.makeText(this, serverAnswer.getString("Info"), Toast.LENGTH_SHORT).show();
