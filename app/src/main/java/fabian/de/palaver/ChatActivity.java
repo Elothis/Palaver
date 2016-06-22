@@ -69,6 +69,7 @@ public class ChatActivity extends AppCompatActivity implements OnDownloadFinishe
         if(id == R.id.action_bar_logout){
             app.setUsername("");
             app.setPassword("");
+            app.setLoggedIn(false);
 
             Intent logOut = new Intent(this, LogInActivity.class);
             startActivity(logOut);

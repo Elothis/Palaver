@@ -10,6 +10,7 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import fabian.de.palaver.gcm.TokenService;
 import fabian.de.palaver.networking.ApiResult;
 import fabian.de.palaver.networking.NetworkHelper;
 import fabian.de.palaver.networking.OnDownloadFinished;
@@ -31,7 +32,7 @@ public class LogInActivity extends AppCompatActivity implements OnDownloadFinish
         app.setContext(this);
         String user = app.getUserName();
 
-        if(!user.isEmpty()){
+        if(app.getLoggedIn()){
             sendLogInRequest(app.getUserName(), app.getPassword());
         }
     }
@@ -57,10 +58,7 @@ public class LogInActivity extends AppCompatActivity implements OnDownloadFinish
 
     @Override
     public void onDownloadFinished(ApiResult json) {
-        if(json == null){
-            Toast.makeText(this, "ApiResult is NULL", Toast.LENGTH_LONG).show();
-            return;
-        }
+
         JSONObject serverAnswer = json.getJsonobj();
         try {
             if(serverAnswer.getInt("MsgType") == 0){
@@ -69,6 +67,10 @@ public class LogInActivity extends AppCompatActivity implements OnDownloadFinish
             else{
                 app.setUsername(username.getText().toString());
                 app.setPassword(password.getText().toString());
+                app.setLoggedIn(true);
+
+                //Intent msgIntent = new Intent(this, TokenService.class);
+                //startService(msgIntent);
 
                 Intent openContactListIntent = new Intent(this, ContactListActivity.class);
                 startActivity(openContactListIntent);

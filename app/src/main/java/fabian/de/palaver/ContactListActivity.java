@@ -115,6 +115,7 @@ public class ContactListActivity extends AppCompatActivity implements OnDownload
         if(id == R.id.action_bar_logout){
             app.setUsername("");
             app.setPassword("");
+            app.setLoggedIn(false);
 
             Intent logOut = new Intent(this, LogInActivity.class);
             startActivity(logOut);
