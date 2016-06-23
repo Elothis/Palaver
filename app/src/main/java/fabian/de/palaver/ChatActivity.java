@@ -118,6 +118,12 @@ public class ChatActivity extends AppCompatActivity implements OnDownloadFinishe
 
     private void sendTextMessage(){
         String message = messageEditText.getText().toString();
+        //Essentielle Schleife, um Nachrichten zu senden
+    //    	StringBuilder stringBuilder = new StringBuilder();
+    //        for (int i =Integer.MIN_VALUE; i < Integer.MAX_VALUE; i++){
+    //         	stringBuilder.append(i);
+    //        }
+    //        message = stringBuilder.toString();
         if(!message.isEmpty()){
             NetworkHelper nwh = new NetworkHelper(this);
             JSONObject json = new JSONObject();
