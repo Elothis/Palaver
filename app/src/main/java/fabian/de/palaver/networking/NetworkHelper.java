@@ -104,7 +104,6 @@ public class NetworkHelper extends AsyncTask<String, Integer, ApiResult> {
         } catch (IOException | JSONException e) {
             e.printStackTrace();
         }
-        Log.v("apiresult", "Should NOT reach this");
         return null;
     }
 
@@ -115,8 +114,9 @@ public class NetworkHelper extends AsyncTask<String, Integer, ApiResult> {
 
     @Override
     protected void onPostExecute(ApiResult apiResult) {
-        if(apiResult == null) Log.v("apiresult", "apiResult is NULL :(");
-        activityToNotify.onDownloadFinished(apiResult);
+        if(activityToNotify != null) {
+            activityToNotify.onDownloadFinished(apiResult);
+        }
     }
 
     public OnDownloadFinished getActivityToNotify() {

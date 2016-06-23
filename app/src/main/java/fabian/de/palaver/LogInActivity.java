@@ -3,6 +3,7 @@ package fabian.de.palaver;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -63,10 +64,9 @@ public class LogInActivity extends AppCompatActivity implements OnDownloadFinish
         try {
             if(serverAnswer.getInt("MsgType") == 0){
                 Toast.makeText(this, serverAnswer.getString("Info"), Toast.LENGTH_LONG).show();
+                app.setLoggedIn(false);
             }
             else{
-                app.setUsername(username.getText().toString());
-                app.setPassword(password.getText().toString());
                 app.setLoggedIn(true);
 
                 //Intent msgIntent = new Intent(this, TokenService.class);
@@ -89,6 +89,8 @@ public class LogInActivity extends AppCompatActivity implements OnDownloadFinish
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        app.setUsername(username);
+        app.setPassword(password);
         nwh.execute(NetworkHelper.ApiCommand.USER_VALIDATE.toString(), json.toString());
     }
 }

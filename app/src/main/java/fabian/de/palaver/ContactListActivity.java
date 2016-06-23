@@ -128,19 +128,16 @@ public class ContactListActivity extends AppCompatActivity implements OnDownload
         }
 
         else if(id == R.id.action_bar_refresh){
-            Log.v("mytag", "refresh clicked");
             setFriendsList();
         }
         return false;
     }
 
     private void setFriendsList(){
-            Log.v("mytag", "setFriendsList()");
             NetworkHelper nwh = new NetworkHelper(this);
             JSONObject json = new JSONObject();
             try {
                 json.put("Username", app.getUserName());
-                Log.v("mytag", "userName in setFriendsList() = " + app.getUserName());
                 json.put("Password", app.getPassword());
             } catch (JSONException e) {
                 e.printStackTrace();

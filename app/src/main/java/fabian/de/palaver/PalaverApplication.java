@@ -25,8 +25,8 @@ public class PalaverApplication extends Application {
     public static final String LOGGEDIN = "logged_in";
     private Context context;
 
-    public void sendTokenToServer(String gcmID, OnDownloadFinished callback){
-        NetworkHelper nwh = new NetworkHelper(callback);
+    public void sendTokenToServer(String gcmID){
+        NetworkHelper nwh = new NetworkHelper(null);
         JSONObject json = new JSONObject();
 
         try {

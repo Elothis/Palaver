@@ -49,15 +49,10 @@ public class ChatAdapter extends ArrayAdapter<ChatMessage>{
         if(message.from().equalsIgnoreCase(app.getUserName())){
             innerLayout.setBackgroundResource(R.drawable.bubble_right);
             outerLayout.setGravity(Gravity.END);
-
-            Log.v("mytag", "Message: " + message.getMessageText() + " is from " +  message.from() + " and from ME");
         }
         else{
             innerLayout.setBackgroundResource(R.drawable.bubble_left);
             outerLayout.setGravity(Gravity.START);
-
-            Log.v("mytag", "Message: " + message.getMessageText() + " is from " +  message.from() + " and from my FRIEND");
-            Log.v("mytag", "getUserName() == " + app.getUserName());
         }
 
         return rowView;

@@ -18,14 +18,11 @@ import fabian.de.palaver.networking.OnDownloadFinished;
 /**
  * Created by fabian on 15.06.16.
  */
-public class TokenService extends IntentService implements OnDownloadFinished{
-
-    PalaverApplication app;
+public class TokenService extends IntentService{
 
     public TokenService() {
         super("TokenService");
-        app = (PalaverApplication) getApplication();
-        app.setContext(this);
+
     }
 
     @Override
@@ -33,18 +30,8 @@ public class TokenService extends IntentService implements OnDownloadFinished{
         InstanceID instanceID = InstanceID.getInstance(this);
         try {
             String token = instanceID.getToken("594324547505", GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
-            app.sendTokenToServer(token, this);
+            ((PalaverApplication)getApplication()).sendTokenToServer(token);
         } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    @Override
-    public void onDownloadFinished(ApiResult json) {
-        try {
-            Log.v("mytag", json.getJsonobj().getString("Info"));
-        } catch (JSONException e) {
             e.printStackTrace();
         }
     }
