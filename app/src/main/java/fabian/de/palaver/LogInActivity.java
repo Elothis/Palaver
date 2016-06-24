@@ -69,8 +69,8 @@ public class LogInActivity extends AppCompatActivity implements OnDownloadFinish
             else{
                 app.setLoggedIn(true);
 
-                //Intent msgIntent = new Intent(this, TokenService.class);
-                //startService(msgIntent);
+                Intent msgIntent = new Intent(this, TokenService.class);
+                startService(msgIntent);
 
                 Intent openContactListIntent = new Intent(this, ContactListActivity.class);
                 startActivity(openContactListIntent);

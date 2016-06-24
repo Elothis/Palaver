@@ -127,9 +127,6 @@ public class ContactListActivity extends AppCompatActivity implements OnDownload
             dialog.show(getFragmentManager(), "Add Contact");
         }
 
-        else if(id == R.id.action_bar_refresh){
-            setFriendsList();
-        }
         return false;
     }
 
