@@ -1,6 +1,11 @@
 package fabian.de.palaver;
 
+import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -37,6 +42,9 @@ public class ChatActivity extends AppCompatActivity implements OnDownloadFinishe
     private List<ChatMessage> chatList = new ArrayList<>();
     private ChatAdapter adapter;
 
+    private boolean receiverRegistered = false;
+    private MessageReceiver receiver = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,9 +58,28 @@ public class ChatActivity extends AppCompatActivity implements OnDownloadFinishe
 
         adapter = new ChatAdapter(this, chatList, app);
         chatListView.setAdapter(adapter);
+        receiver = new MessageReceiver();
 
         getChatHistory();
 
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(receiverRegistered){
+            unregisterReceiver(receiver);
+            receiverRegistered = false;
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if(!receiverRegistered){
+            registerReceiver(receiver, new IntentFilter("de.uni_due.paluno.se.palaver.message." + chatPartner));
+        }
+        removeNotifications();
     }
 
     @Override
@@ -192,4 +219,20 @@ public class ChatActivity extends AppCompatActivity implements OnDownloadFinishe
             e.printStackTrace();
         }
     }
+
+    public void removeNotifications(){
+        NotificationManager nm = (NotificationManager) getApplicationContext().getSystemService(NOTIFICATION_SERVICE);
+        nm.cancelAll();
+    }
+
+    private class MessageReceiver extends BroadcastReceiver{
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            getChatHistory();
+            removeNotifications();
+        }
+    }
+
 }
+

@@ -23,6 +23,7 @@ public class PalaverApplication extends Application {
     public static final String PASSWORD = "password";
     public static final String FRIENDS = "friends";
     public static final String LOGGEDIN = "logged_in";
+    public int notificationID = 0;
     private Context context;
 
     public void sendTokenToServer(String gcmID){

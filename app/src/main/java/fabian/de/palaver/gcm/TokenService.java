@@ -20,6 +20,8 @@ import fabian.de.palaver.networking.OnDownloadFinished;
  */
 public class TokenService extends IntentService{
 
+    public static String TOKEN_ID = "594324547505";
+
     public TokenService() {
         super("TokenService");
 
@@ -29,7 +31,7 @@ public class TokenService extends IntentService{
     protected void onHandleIntent(Intent intent) {
         InstanceID instanceID = InstanceID.getInstance(this);
         try {
-            String token = instanceID.getToken("594324547505", GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
+            String token = instanceID.getToken(TOKEN_ID, GoogleCloudMessaging.INSTANCE_ID_SCOPE, null);
             ((PalaverApplication)getApplication()).sendTokenToServer(token);
         } catch (IOException e) {
             e.printStackTrace();
