@@ -1,5 +1,7 @@
 package fabian.de.palaver;
 
+import android.*;
+import android.Manifest;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -10,6 +12,7 @@ import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -53,6 +56,7 @@ public class ChatActivity extends AppCompatActivity implements OnDownloadFinishe
     private List<ChatMessage> chatList = new ArrayList<>();
     private ChatAdapter adapter;
     public static final String LOCATION_SHARED = "hat seinen Standort geteilt";
+    private final int REQUEST_PERMISSION = 123;
 
     private boolean receiverRegistered = false;
     private MessageReceiver receiver = null;
@@ -170,7 +174,7 @@ public class ChatActivity extends AppCompatActivity implements OnDownloadFinishe
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
                 ChatMessage message = (ChatMessage) adapterView.getItemAtPosition(i);
-                if(message.getMimetype().equals("location/plain")){
+                if (message.getMimetype().equals("location/plain")) {
                     Toast.makeText(getApplicationContext(), message.getMessageText(), Toast.LENGTH_SHORT).show();
                 }
             }
@@ -199,8 +203,9 @@ public class ChatActivity extends AppCompatActivity implements OnDownloadFinishe
                 json.put("Password", app.getPassword());
                 json.put("Recipient", chatPartner);
                 json.put("Mimetype", mimeType);
-                if(textMessage) json.put("Data", message);
-                else json.put("Data", lastLocation.getAltitude() + ":" + lastLocation.getLatitude() + ":" + lastLocation.getLongitude());
+                if (textMessage) json.put("Data", message);
+                else
+                    json.put("Data", lastLocation.getAltitude() + ":" + lastLocation.getLatitude() + ":" + lastLocation.getLongitude());
 
             } catch (JSONException e) {
                 e.printStackTrace();
@@ -273,12 +278,39 @@ public class ChatActivity extends AppCompatActivity implements OnDownloadFinishe
     }
 
     private void getLocation() {
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(this, "Location Services nicht erlaubt", Toast.LENGTH_SHORT).show();
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSION);
+
             return;
         }
         lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case REQUEST_PERMISSION:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    getLocation();
+                } else {
+
+                    Toast.makeText(this, "Location Services denied", Toast.LENGTH_SHORT)
+                            .show();
+                }
+                break;
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 
     @Override
