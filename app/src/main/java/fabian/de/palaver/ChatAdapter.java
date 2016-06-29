@@ -40,7 +40,9 @@ public class ChatAdapter extends ArrayAdapter<ChatMessage>{
         TextView messageTextView = (TextView) rowView.findViewById(R.id.message_text_view);
 
         dateTextView.setText(message.getDate());
-        messageTextView.setText(message.getMessageText());
+        boolean textMessage = message.getMimetype().equals("text/plain");
+        if(textMessage) messageTextView.setText(message.getMessageText());
+        else messageTextView.setText(message.from() + ChatActivity.LOCATION_SHARED);
 
         LinearLayout innerLayout = (LinearLayout) rowView.findViewById(R.id.bubble_inner_layout);
         LinearLayout outerLayout = (LinearLayout) rowView.findViewById(R.id.bubble_parent_layout);

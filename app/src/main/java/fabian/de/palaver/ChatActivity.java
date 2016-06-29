@@ -5,18 +5,29 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.Message;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,7 +43,7 @@ import fabian.de.palaver.networking.ApiResult;
 import fabian.de.palaver.networking.NetworkHelper;
 import fabian.de.palaver.networking.OnDownloadFinished;
 
-public class ChatActivity extends AppCompatActivity implements OnDownloadFinished {
+public class ChatActivity extends AppCompatActivity implements OnDownloadFinished, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     PalaverApplication app;
     private EditText messageEditText;
@@ -41,9 +52,13 @@ public class ChatActivity extends AppCompatActivity implements OnDownloadFinishe
     private ImageButton sendButton;
     private List<ChatMessage> chatList = new ArrayList<>();
     private ChatAdapter adapter;
+    public static final String LOCATION_SHARED = "hat seinen Standort geteilt";
 
     private boolean receiverRegistered = false;
     private MessageReceiver receiver = null;
+
+    GoogleApiClient mGoogleApiClient = null;
+    Location lastLocation = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,12 +77,31 @@ public class ChatActivity extends AppCompatActivity implements OnDownloadFinishe
 
         getChatHistory();
 
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addApi(LocationServices.API)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .build();
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        mGoogleApiClient.connect();
+        super.onStart();
+    }
+
+    @Override
+    protected void onStop() {
+        mGoogleApiClient.disconnect();
+        super.onStop();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if(receiverRegistered){
+        if (receiverRegistered) {
             unregisterReceiver(receiver);
             receiverRegistered = false;
         }
@@ -76,7 +110,8 @@ public class ChatActivity extends AppCompatActivity implements OnDownloadFinishe
     @Override
     protected void onResume() {
         super.onResume();
-        if(!receiverRegistered){
+
+        if (!receiverRegistered) {
             registerReceiver(receiver, new IntentFilter("de.uni_due.paluno.se.palaver.message." + chatPartner));
         }
         removeNotifications();
@@ -93,23 +128,21 @@ public class ChatActivity extends AppCompatActivity implements OnDownloadFinishe
 
         int id = item.getItemId();
 
-        if(id == R.id.action_bar_logout){
+        if (id == R.id.action_bar_logout) {
             app.setUsername("");
             app.setPassword("");
             app.setLoggedIn(false);
 
             Intent logOut = new Intent(this, LogInActivity.class);
             startActivity(logOut);
-        }
-
-        else if(id == R.id.action_bar_refresh){
-            getChatHistory();
+        } else if (id == R.id.action_bar_location) {
+            sendMessage(false);
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    private void initialiizeWidgets(){
+    private void initialiizeWidgets() {
         app = (PalaverApplication) getApplication();
         app.setContext(this);
         messageEditText = (EditText) findViewById(R.id.chat_message_edit_text);
@@ -120,10 +153,9 @@ public class ChatActivity extends AppCompatActivity implements OnDownloadFinishe
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(s.length() == 0){
+                if (s.length() == 0) {
                     sendButton.setEnabled(false);
-                }
-                else{
+                } else {
                     sendButton.setEnabled(true);
                 }
             }
@@ -133,27 +165,43 @@ public class ChatActivity extends AppCompatActivity implements OnDownloadFinishe
             }
         });
         chatListView = (ListView) findViewById(R.id.chat_list_view);
+        chatListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                ChatMessage message = (ChatMessage) adapterView.getItemAtPosition(i);
+                if(message.getMimetype().equals("location/plain")){
+                    Toast.makeText(getApplicationContext(), message.getMessageText(), Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
         sendButton = (ImageButton) findViewById(R.id.send_message_image_button);
         sendButton.setEnabled(false);
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sendTextMessage();
+                sendMessage(true);
             }
         });
     }
 
-    private void sendTextMessage(){
+    private void sendMessage(boolean textMessage) {
         String message = messageEditText.getText().toString();
-        if(!message.isEmpty()){
+        String mimeType = textMessage ? "text/plain" : "location/plain";
+
+        Log.v("mytag", mimeType);
+
+        if (!message.isEmpty() || mimeType.equals("location/plain")) {
             NetworkHelper nwh = new NetworkHelper(this);
             JSONObject json = new JSONObject();
             try {
                 json.put("Username", app.getUserName());
                 json.put("Password", app.getPassword());
                 json.put("Recipient", chatPartner);
-                json.put("Mimetype", "text/plain");
-                json.put("Data", message);
+                json.put("Mimetype", mimeType);
+                if(textMessage) json.put("Data", message);
+                else json.put("Data", lastLocation.getAltitude() + ":" + lastLocation.getLatitude() + ":" + lastLocation.getLongitude());
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -161,7 +209,8 @@ public class ChatActivity extends AppCompatActivity implements OnDownloadFinishe
         }
     }
 
-    private void getChatHistory(){
+
+    private void getChatHistory() {
         NetworkHelper nwh = new NetworkHelper(this);
         JSONObject json = new JSONObject();
         try {
@@ -188,41 +237,63 @@ public class ChatActivity extends AppCompatActivity implements OnDownloadFinishe
                         JSONObject jitem;
                         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
 
-                        for(int i = 0; i < jarray.length(); i++){
+                        for (int i = 0; i < jarray.length(); i++) {
                             jitem = jarray.getJSONObject(i);
                             String sender = jitem.getString("Sender");
                             String recipient = jitem.getString("Recipient");
                             String mimetype = jitem.getString("Mimetype");
+                            boolean textMessage = mimetype.equals("text/plain");
                             String data = jitem.getString("Data");
                             Date date = dateFormat.parse(jitem.getString("DateTime"));
 
                             chatList.add(new ChatMessage(sender, recipient, date, mimetype, data));
                         }
                         adapter.notifyDataSetChanged();
-                    }
-                    else{
+                    } else {
                         Toast.makeText(this, serverAnswer.getString("Info"), Toast.LENGTH_SHORT).show();
                     }
                     break;
                 case MESSAGE_SEND:
-                    if(serverAnswer.getInt("MsgType") == 1){
+                    if (serverAnswer.getInt("MsgType") == 1) {
                         getChatHistory();
                         messageEditText.setText("");
-                    }
-                    else{
+                    } else {
                         Toast.makeText(this, serverAnswer.getString("Info"), Toast.LENGTH_SHORT).show();
                     }
                     break;
             }
-        }
-        catch(JSONException | ParseException e){
+        } catch (JSONException | ParseException e) {
             e.printStackTrace();
         }
     }
 
-    public void removeNotifications(){
+    public void removeNotifications() {
         NotificationManager nm = (NotificationManager) getApplicationContext().getSystemService(NOTIFICATION_SERVICE);
         nm.cancelAll();
+    }
+
+    private void getLocation() {
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "Location Services nicht erlaubt", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        getLocation();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
     }
 
     private class MessageReceiver extends BroadcastReceiver{
