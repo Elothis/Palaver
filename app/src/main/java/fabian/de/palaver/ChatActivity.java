@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -41,6 +42,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import fabian.de.palaver.networking.ApiResult;
 import fabian.de.palaver.networking.NetworkHelper;
@@ -77,7 +79,6 @@ public class ChatActivity extends AppCompatActivity implements OnDownloadFinishe
 
         adapter = new ChatAdapter(this, chatList, app);
         chatListView.setAdapter(adapter);
-        receiver = new MessageReceiver();
 
         getChatHistory();
 
@@ -105,19 +106,17 @@ public class ChatActivity extends AppCompatActivity implements OnDownloadFinishe
     @Override
     protected void onPause() {
         super.onPause();
-        if (receiverRegistered) {
-            unregisterReceiver(receiver);
-            receiverRegistered = false;
-        }
+        unregisterReceiver(receiver);
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        receiver = new MessageReceiver();
 
-        if (!receiverRegistered) {
-            registerReceiver(receiver, new IntentFilter("de.uni_due.paluno.se.palaver.message." + chatPartner));
-        }
+        registerReceiver(receiver, new IntentFilter("de.uni_due.paluno.se.palaver.message." + chatPartner));
+
         removeNotifications();
     }
 
@@ -175,7 +174,12 @@ public class ChatActivity extends AppCompatActivity implements OnDownloadFinishe
 
                 ChatMessage message = (ChatMessage) adapterView.getItemAtPosition(i);
                 if (message.getMimetype().equals("location/plain")) {
-                    Toast.makeText(getApplicationContext(), message.getMessageText(), Toast.LENGTH_SHORT).show();
+                    String[] params = message.getMessageText().split(":");
+
+                    String uri = String.format(Locale.ENGLISH, "geo:%f,%f", Float.parseFloat(params[1]), Float.parseFloat(params[2]));
+                    Log.v("mytag", uri);
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
+                    startActivity(intent);
                 }
             }
         });
@@ -280,13 +284,6 @@ public class ChatActivity extends AppCompatActivity implements OnDownloadFinishe
     private void getLocation() {
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
 
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_PERMISSION);
 
